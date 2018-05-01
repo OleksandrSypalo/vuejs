@@ -85,11 +85,8 @@ const router = new VueRouter({
             path: '/init-demo',
             beforeEnter: (to, from, next) => {
                 auth.logout();
-                DB.use(randomDB).initForDemo(true);
+                DB.use(randomDB).initForDemo();
                 next('/');
-                window.setTimeout(() => {
-                    window.location.reload();
-                }, 1);
             }
         },
         {

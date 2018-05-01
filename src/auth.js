@@ -39,8 +39,11 @@ export default {
     },
     username() {
         let userData = DB.get('users', this.getToken());
-
         return userData ? userData.username : null;
+    },
+    userId(){
+        let userData = DB.get('users', this.getToken());
+        return userData ? userData.id : null;
     },
 
     onChange(authenticated) {

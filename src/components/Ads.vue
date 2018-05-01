@@ -7,7 +7,7 @@
                  class="margin-bottom-1rem"
                  :fields="fields"
                  :items="currentItems"
-                 :show-empty=true
+                 :show-empty= true
         >
             <template slot="empty">
                 <div>
@@ -46,116 +46,119 @@
 </template>
 
 <script>
-    import DB from '../db';
-    import utils from '../utils';
-    import auth from '../auth';
+import DB from '../db';
+import utils from '../utils';
+import auth from '../auth';
 
-    let userToken = auth.getToken();
-    let userId = userToken ? +DB.get('users', userToken).id : null;
-    let users = Object.values(DB.get('users'));
+export default {
+    data() {
+        return {
+            perPage: 5,
+            currentPage: 1,
 
-    export default {
-        data() {
-            return {
-                perPage: 5,
-                currentPage: 1,
-
-                fields: [
-                    {key: 'id', label: '#'},
-                    {
-                        key: 'title', label: 'Title', formatter: (value, key, item) => {
-                            return {
-                                title: utils.substring(value, 16),
-                                id: item.id
-                            };
-                        }
-                    },
-                    {
-                        key: 'description', label: 'Description', formatter: (value) => {
-                            return utils.substring(value, 50);
-                        }
-                    },
-                    {
-                        key: 'authorID',
-                        label: 'Author',
-                        formatter: (value) => {
-                            let authorName = '-';
-                            users.forEach((userData) => {
-                                if (+userData.id === +value) {
-                                    authorName = userData.username;
-                                    return false; // break
-                                }
-                            });
-
-                            return authorName;
-                        }
-                    },
-                    {
-                        key: 'date',
-                        label: 'Date',
-                        formatter: (value) => {
-                            return value ? utils.replaceDate(value) : '-';
-                        }
-                    },
-                    {
-                        key: 'hasEdit',
-                        label: 'Edit',
-                        formatter: (value, key, item) => {
-                            return {
-                                is: !!(userId && +userId === +item.authorID),
-                                id: item.id
-                            };
-                        }
-                    },
-                ],
-                items: getItems()
-            };
-        },
-        computed: {
-            currentItems() {
-                let firstItemIndex = (this.currentPage - 1) * this.perPage;
-                return this.items.slice(firstItemIndex, firstItemIndex + this.perPage);
-            },
-            totalRows() {
-                return this.items.length;
-            }
-        },
-        created() {
-            auth.onChangeTriggersData.push(loggedIn => {
-                let userId = loggedIn ? +DB.get('users', auth.getToken()).id : null;
-
-                this.fields[5].formatter = (value, key, item) => {
+            fields: [
+                {
+                    key: 'id',
+                    label: '#'
+                },
+                {
+                    key: 'title', label: 'Title', formatter: (value, key, item) => {
                     return {
-                        is: !!(userId && +userId === +item.authorID),
+                        title: utils.substring(value, 16),
                         id: item.id
                     };
-                };
-            });
-            DB.setTrigger(['set', 'drop'], 'ads', () => {
-                this.items = getItems();
-            });
-        },
-    };
+                }
+                },
+                {
+                    key: 'description', label: 'Description', formatter: (value) => {
+                    return utils.substring(value, 50);
+                }
+                },
+                {
+                    key: 'authorID',
+                    label: 'Author',
+                    formatter: (value) => {
+                        let authorName = '-';
+                        let users = Object.values(DB.get('users'));
 
-    function getItems() {
-        return Object
+                        users.forEach((userData) => {
+                            if (+userData.id === +value) {
+                                authorName = userData.username;
+                                return false; // break
+                            }
+                        });
+
+                        return authorName;
+                    }
+                },
+                {
+                    key: 'date',
+                    label: 'Date',
+                    formatter: (value) => {
+                        return value ? utils.replaceDate(value) : '-';
+                    }
+                },
+                {
+                    key: 'hasEdit',
+                    label: 'Edit',
+                    formatter: (value, key, item) => {
+                        let currentUserID = auth.userId();
+
+                        return {
+                            is: !!(currentUserID && +currentUserID === +item.authorID),
+                            id: item.id
+                        };
+                    }
+                }
+            ],
+            items: getItems()
+        };
+    },
+    computed: {
+        currentItems() {
+            let firstItemIndex = (this.currentPage - 1) * this.perPage;
+            return this.items.slice(firstItemIndex, firstItemIndex + this.perPage);
+        },
+        totalRows() {
+            return this.items.length;
+        }
+    },
+    created() {
+        auth.onChangeTriggersData.push(loggedIn => {
+            let currentUserID = loggedIn ? auth.userId() : null;
+
+            this.fields[5].formatter = (value, key, item) => {
+                return {
+                    is: !!(currentUserID && +currentUserID === +item.authorID),
+                    id: item.id
+                };
+            };
+        });
+        DB.setTrigger(['set', 'drop'], 'ads', () => {
+            this.items = getItems();
+        });
+    }
+};
+
+function getItems() {
+    return Object
             .values(DB.get('ads'))
             .sort((a, b) => {
                 return a.id > b.id ? 1 : -1;
             });
-    }
+}
 </script>
 
 <style>
-    .width-4_5 {
-        width: 4.5em;
-    }
+.width-4_5 {
+    width: 4.5em;
+}
 
-    .width-4_5 > .btn:first-child {
-        margin-right: 4px;
-    }
+.width-4_5 > .btn:first-child {
+    margin-right: 4px;
+}
 
-    .icon {
-        width: 1em;
-    }
+.icon {
+    width: 1em;
+}
 </style>

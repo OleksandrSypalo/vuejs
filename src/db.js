@@ -23,8 +23,8 @@ export default {
         const opers = (oper === '*')
             ? this.opers
             : (oper instanceof Array)
-                ? oper
-                : [oper];
+            ? oper
+            : [oper];
 
         opers.forEach((currentOper) => {
             this.triggersData[currentOper + '.' + dbName] = (this.triggersData[currentOper + '.' + dbName] || []);
@@ -139,5 +139,15 @@ export default {
     },
     use(constructor) {
         return Object.assign(this, constructor);
-    }
+    },
+
+    demoHaveCreated() {
+        return localStorage.demoCreated;
+    },
+    onCreateTriggersData: [],
+    onCreateTriggers() {
+        this.onCreateTriggersData.forEach((fn) => {
+            fn();
+        });
+    },
 };

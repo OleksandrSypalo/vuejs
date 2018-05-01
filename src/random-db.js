@@ -1,29 +1,29 @@
 import utils from './utils';
 
 export default {
-    initForDemo(isForcibly) {
-        if (isForcibly || !Object.keys(this.get('users')).length) {
-            this.drop('users');
+    initForDemo() {
+        this.drop('users');
+        this.drop('ads');
 
-            /* create 2 users */
-            for (let i = 0; i < 2; i++) {
-                this.set('users', {
-                    [this.uniq()]: createRandomUser(i + 1)
-                });
-            }
+        /* create 2 users */
+        for (let i = 0; i < 2; i++) {
+            this.set('users', {
+                [this.uniq()]: createRandomUser(i + 1)
+            });
         }
 
-        if (isForcibly || !Object.keys(this.get('ads')).length) {
-            this.drop('ads');
 
-            /* create 20 random ads */
-            for (let i = 0; i < 20; i++) {
-                this.set('ads', {
-                    [this.uniq()]: createRandomAd(i + 1)
-                });
-            }
+        /* create 20 random ads */
+        for (let i = 0; i < 20; i++) {
+            this.set('ads', {
+                [this.uniq()]: createRandomAd(i + 1)
+            });
         }
+
+        localStorage.demoCreated = 1;
+        this.onCreateTriggers();
     }
+
 };
 
 function createRandomUser(id) {
