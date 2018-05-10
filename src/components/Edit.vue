@@ -15,6 +15,7 @@
             <b-form-group label="Description:" label-for="descriptionArea">
                 <b-form-textarea id="descriptionArea"
                                  v-model="form.description"
+                                 required
                                  placeholder="Enter description"
                                  :rows="3"
                                  :max-rows="6">

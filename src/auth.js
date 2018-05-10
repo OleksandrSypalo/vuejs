@@ -71,6 +71,12 @@ function pretendRequest(req, cb) {
         });
     }
 
+    if (!req.password) {
+        return cb({
+            error: 'Please enter password'
+        });
+    }
+
     users = DB.get('users');
 
     for (let key in users) {
@@ -95,7 +101,7 @@ function pretendRequest(req, cb) {
             [token]: {
                 id: lastUserID + 1,
                 username: req.username,
-                password: ''
+                password: req.password
             }
         });
     }
